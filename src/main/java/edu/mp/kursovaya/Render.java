@@ -38,7 +38,7 @@ public class Render {
         for (int i = 0; i < table.mainField.length; i++) {
             rows.add(new StringBuilder(table.factoriesVolume[i] + "\t"));
             for (Integer ceil : table.transportField[i]) {
-                rows.getLast().append(ceil).append("\t");
+                rows.getLast().append(ceil.equals(0) ? "X" : ceil).append("\t");
             }
             rows.getLast().append("\n");
         }

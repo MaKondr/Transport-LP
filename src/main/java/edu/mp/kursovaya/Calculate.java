@@ -89,6 +89,23 @@ public class Calculate {
                 consumersVolume[j_min] = 0;
             }
         }
+
+
+    }
+
+    public static Integer calcTargetFunction(Table table){
+        // Расчёт целевой функции
+        int L = 0;
+        for (int i = 0; i < table.transportField.length; i++) {
+            for (int j = 0; j < table.transportField[i].length; j++) {
+                L += table.transportField[i][j] * table.mainField[i][j];
+            }
+            if(!Objects.isNull(table.factoriesCost)){
+                if(table.factoriesCost.size() <= i ) continue;
+                L += table.factoriesCost.get(i)[0] * Arrays.stream(table.transportField[i]).reduce(0, Integer::sum) + table.factoriesCost.get(i)[1];
+            }
+        }
+        return L;
     }
 
     private static boolean isZeroLast(Integer[] factories, Integer[] consumers) {

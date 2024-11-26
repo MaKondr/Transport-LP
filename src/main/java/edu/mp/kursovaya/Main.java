@@ -4,10 +4,14 @@ package edu.mp.kursovaya;
 import static edu.mp.kursovaya.Calculate.*;
 import static edu.mp.kursovaya.CommonTables.*;
 import static edu.mp.kursovaya.Render.*;
+import static edu.mp.kursovaya.CalculateOptimalFactories.*;
 
 
 public class Main {
+    private static final Table table = table1;
     public static void main(String[] args) {
+
+//        Table table = initTable();
 
         // ИНИЦИАЛИЗАЦИЯ ТАБЛИЦЫ
         System.out.println("Input table:\n");
@@ -30,5 +34,6 @@ public class Main {
         System.out.println("Find First Plan:\n");
         findFirstPlan(table);
         System.out.println(renderTransportTable(table));
+        System.out.println(calcTargetFunction(table));
     }
 }
