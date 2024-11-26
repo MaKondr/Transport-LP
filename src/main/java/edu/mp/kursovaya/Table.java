@@ -1,32 +1,22 @@
 package edu.mp.kursovaya;
 
+import java.util.Arrays;
+
 public class Table {
 
     Integer[] factoriesVolume;
     Integer[] consumersVolume;
-    public  Ceil[][] mainField;
-    public static class Ceil{
-        Integer costCeil = 0 ;
 
-        public Ceil(Integer costCeil){
-            this.costCeil = costCeil;
-        }
-    }
+    public int row, column;
+    public Integer[][] mainField;
+    Integer[][] transportField;
 
-    public Table(int[][] costs, Integer[] factories, Integer[] consumers){
-        mainField = new Ceil[costs.length][costs[0].length];
+    public Table(Integer[][] costs, Integer[] factories, Integer[] consumers) {
+        mainField = costs;
+        row = mainField.length;
+        column = mainField[0].length;
+        Arrays.stream(transportField = new Integer[row][column]).forEach(str-> Arrays.fill(str, 0));
         factoriesVolume = factories;
         consumersVolume = consumers;
-        initCeils(costs);
     }
-
-    private void initCeils(int[][] costs){
-        for (int i = 0; i < costs.length; i++) {
-            for (int i1 = 0; i1 < costs[i].length; i1++) {
-                mainField[i][i1] = new Ceil(costs[i][i1]);
-            }
-        }
-    }
-
-
 }
