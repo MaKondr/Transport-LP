@@ -25,7 +25,6 @@ public class CalculatePotential {
     public static void recalculateLoop(Table table, Integer[] startCeil) {
         Integer[][] transportField = table.transportField;
         Integer[][] mainField = table.mainField;
-        Integer[][] pseudoField = table.pseudoField;
         List<Integer[]> loop = new ArrayList<>();
         buildCycle(transportField, new boolean[mainField.length][mainField[0].length], loop, startCeil, new Integer[]{-1, -1});
         table.loop = loop.toArray(Integer[][]::new);
@@ -36,9 +35,13 @@ public class CalculatePotential {
         int prevI = previousCeil[0], prevJ = previousCeil[1];
         loop.add(currentCeil);
         visitedCeil[curI][curJ] = true;
+
         for (int j = 0; j < mainTable[curI].length; j++) {
             if (j != curJ && (!mainTable[curI][j].equals(0) || (j == loop.getFirst()[1] && curI == loop.getFirst()[0])) && !(curI == prevI && j == prevJ)) {
                 if (loop.size() > 3 && j == loop.getFirst()[1] && curI == loop.getFirst()[0]) {
+                    return true;
+                }
+                if (loop.size() >3 && curI == loop.getFirst()[0]){
                     return true;
                 }
                 if (!visitedCeil[curI][j]) {
@@ -52,6 +55,9 @@ public class CalculatePotential {
         for (int i = 0; i < mainTable.length; i++) {
             if (i != curI && (!mainTable[i][curJ].equals(0) || (i == loop.getFirst()[0] && curJ == loop.getFirst()[1])) && !(i == prevI && curJ == prevJ)) {
                 if (loop.size() > 3 && i == loop.getFirst()[0] && curJ == loop.getFirst()[1]) {
+                    return true;
+                }
+                if (loop.size() >3 && curJ == loop.getFirst()[1]){
                     return true;
                 }
                 if (!visitedCeil[i][curJ]) {
@@ -104,20 +110,29 @@ public class CalculatePotential {
     public static Map<String, ?> isOptimalPlan(Table table) {
         Integer[][] mainField = table.mainField;
         Integer[][] pseudoField = table.pseudoField;
-
+        List<Integer> dif = new ArrayList<>();
+        List<Integer[]> ceil = new ArrayList<>();
         for (int i = 0; i < mainField.length; i++) {
             for (int j = 0; j < mainField[i].length; j++) {
                 if (mainField[i][j] < pseudoField[i][j]) {
-                    int dif = pseudoField[i][j] - mainField[i][j];
-                    return Map.of(
-                            "check", false,
-                            "ceil", i + "," + j,
-                            "dif", dif
-                    );
+                    dif.add(pseudoField[i][j] - mainField[i][j]);
+                    ceil.add(new Integer[]{i,j});
                 }
             }
         }
-        return Map.of("check", true);
+        return dif.isEmpty() ? Map.of("check", true) : Map.of(
+                "check", false,
+                "ceil", ceil,
+                "dif", dif
+        );
+    }
+
+    public static Integer[] findOptimalCeil(Map<String, ?> resultCheckOptimal){
+        List<Integer> dif = (List<Integer>) resultCheckOptimal.get("dif");
+        int max = dif.stream().max(Integer::compareTo).get();
+        int maxIndex = dif.indexOf(max);
+        List<Integer[]> ceil = (List<Integer[]>) resultCheckOptimal.get("ceil");
+        return ceil.get(maxIndex);
     }
 
     private static void fillEmptyPotential(Integer[][] transportField, Integer[] factoriesPotential, Integer[] consumersPotential, Integer[][] mainField) {
@@ -139,8 +154,8 @@ public class CalculatePotential {
     }
 
     private static boolean isEmptyPotentials(Integer[] factoriesPotential, Integer[] consumersPotential) {
-        return Arrays.stream(consumersPotential).anyMatch(Objects::isNull) &&
-                Arrays.stream(factoriesPotential).anyMatch(Objects::isNull);
+        return !(Arrays.stream(consumersPotential).allMatch(Objects::nonNull) &&
+                Arrays.stream(factoriesPotential).allMatch(Objects::nonNull));
     }
 
 

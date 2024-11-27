@@ -75,7 +75,10 @@ public class Render {
         if ((Boolean) result.get("check")) {
             return sb.append("true").toString();
         }
-        String ceil = "Ceil: " + result.get("ceil") + "\t";
+        List<Integer[]> ceils = (List<Integer[]>) result.get("ceil");
+        StringBuilder ceilBuilder = new StringBuilder();
+        ceils.stream().forEach(ceil -> ceilBuilder.append(Arrays.toString(ceil)));
+        String ceil = "Ceil: " + ceilBuilder + "\t";
         String dif = "Dif: " + result.get("dif").toString() + "\t";
         return sb.append("false\t").append(ceil).append(dif).toString();
     }

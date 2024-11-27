@@ -54,4 +54,21 @@ public class CommonTables {
                 consumers
         );
     }
+
+    public static Table table4;
+
+    static {
+        Integer[][] costs = {
+                {7,8,5,3},
+                {2,4,5,9},
+                {6,3,1,2},
+        };
+        Integer[] consumers = {8,9,9,7};
+        Integer[] factories = {11,11,8};
+        table4 = new Table(
+                costs,
+                factories,
+                consumers
+        );
+    }
 }

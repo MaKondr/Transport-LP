@@ -2,6 +2,7 @@ package edu.mp.kursovaya;
 
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import static edu.mp.kursovaya.Calculate.*;
@@ -12,7 +13,7 @@ import static edu.mp.kursovaya.CalculateOptimalFactories.*;
 
 
 public class Main {
-    private static final Table table = table3;
+    private static final Table table = table4;
 
     public static void main(String[] args) {
 
@@ -28,10 +29,12 @@ public class Main {
             System.out.println("FALSE: sumA > sumB");
             System.out.println("Balanced table:");
             normalize(table);
+            System.out.println(renderMainTable(table));
         } else if (isBalance(table) < 0) {
             System.out.println("FALSE: sumA < sumB");
             System.out.println("Balanced table:");
             normalize(table);
+            System.out.println(renderMainTable(table));
         } else System.out.println("TRUE\n");
 
         // Нахождение Начального Опорного плана
@@ -75,8 +78,12 @@ public class Main {
 
             // Составляем цикл пересчёта
             System.out.println("4. Find Recalculation Loop\n");
-            String ceil = (String) isOptimalPlan.get("ceil");
-            Integer[] startCeil = Arrays.stream(ceil.split(",")).map(Integer::parseInt).toArray(Integer[]::new);
+
+            Integer[] startCeil = findOptimalCeil(isOptimalPlan);
+//            String ceil = isOptimalPlan.get("ceil").toString();
+//            Integer[] startCeil = Arrays.stream(ceil.split(",")).map(Integer::parseInt).toArray(Integer[]::new);
+
+
             recalculateLoop(table, startCeil);
             System.out.println(renderRecalculationLoop(table) + "\n");
 

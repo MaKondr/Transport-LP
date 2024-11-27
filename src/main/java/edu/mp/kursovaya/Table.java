@@ -27,6 +27,9 @@ public class Table {
     // Поле с псевдостоимостью
     Integer[][] pseudoField;
 
+    // Клетки которые мы обозначили за эпсилон
+    List<Integer[]> epsilonsCeil;
+
     // Цикл для пересчёта
     Integer[][] loop;
 
