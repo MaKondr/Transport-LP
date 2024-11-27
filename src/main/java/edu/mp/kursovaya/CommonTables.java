@@ -17,7 +17,7 @@ public class CommonTables {
                 costs,
                 factories,
                 consumers
-                );
+        );
     }
 
     public static Table table2;
@@ -31,6 +31,24 @@ public class CommonTables {
         Integer[] consumers = {30, 15, 25};
         Integer[] factories = {3, 0, 15};
         table2 = new Table(
+                costs,
+                factories,
+                consumers
+        );
+    }
+
+    public static Table table3;
+
+    static {
+        Integer[][] costs = {
+                {2, 4, 1, 2},
+                {2, 2, 4, 3},
+                {1, 1, 2, 1},
+                {1, 1, 1, 1},
+        };
+        Integer[] consumers = {3, 8, 4, 3};
+        Integer[] factories = {4, 5, 4, 5};
+        table3 = new Table(
                 costs,
                 factories,
                 consumers

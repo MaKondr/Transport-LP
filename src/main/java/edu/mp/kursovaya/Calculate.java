@@ -9,6 +9,22 @@ public class Calculate {
         return aSum.compareTo(bSum);
     }
 
+    public static boolean isNoneDegenerate(Table table) {
+        Integer[][] transportField = table.transportField;
+
+        int targetsCount = 0;
+        int m = transportField.length;
+        int n = transportField[0].length;
+
+        for (Integer[] rows : transportField) {
+            for (Integer row : rows) {
+                targetsCount += row.equals(0) ? 0 : 1;
+            }
+        }
+
+        return targetsCount == m + n - 1;
+    }
+
     public static void normalize(Table table) {
         int aSum = Arrays.stream(table.factoriesVolume).reduce(0, Integer::sum);
         int bSum = Arrays.stream(table.consumersVolume).reduce(0, Integer::sum);
@@ -37,7 +53,7 @@ public class Calculate {
             table.factoriesVolume[table.factoriesVolume.length - 1] = bSum - aSum;
             table.mainField = newArray;
             Arrays.stream(table.transportField = new Integer[newArray.length][newArray[0].length]).forEach(str -> Arrays.fill(str, 0));
-        }
+            }
     }
 
     public static void findFirstPlan(Table table) {
