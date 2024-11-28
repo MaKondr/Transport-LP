@@ -9,7 +9,7 @@ public class Calculate {
         return aSum.compareTo(bSum);
     }
 
-    public static boolean isNoneDegenerate(Table table) {
+    public static Map<String, ?> isNoneDegenerate(Table table) {
         Integer[][] transportField = table.transportField;
 
         int targetsCount = 0;
@@ -22,7 +22,28 @@ public class Calculate {
             }
         }
 
-        return targetsCount == m + n - 1;
+        return targetsCount == m + n - 1 ? Map.of("check", true) : Map.of(
+                "check", false,
+                "count", (m + n - 1) - targetsCount
+        );
+    }
+
+    public static void setEpsilon(Table table, Map<String, ?> map) {
+        Integer targetsCount = (Integer) map.get("count");
+        Integer[][] transportField = table.transportField;
+        table.epsilonsCeil = new ArrayList<>();
+
+        for (int i = 0; i < transportField.length; i++) {
+            for (int j = 0; j < transportField[i].length; j++) {
+                if (transportField[i][j].equals(0)) {
+                    table.epsilonsCeil.add(new Integer[]{i, j});
+                }
+                if (targetsCount == table.epsilonsCeil.size()) {
+                    return;
+                }
+            }
+        }
+
     }
 
     public static void normalize(Table table) {
@@ -53,7 +74,7 @@ public class Calculate {
             table.factoriesVolume[table.factoriesVolume.length - 1] = bSum - aSum;
             table.mainField = newArray;
             Arrays.stream(table.transportField = new Integer[newArray.length][newArray[0].length]).forEach(str -> Arrays.fill(str, 0));
-            }
+        }
     }
 
     public static void findFirstPlan(Table table) {
@@ -109,15 +130,15 @@ public class Calculate {
 
     }
 
-    public static Integer calcTargetFunction(Table table){
+    public static Integer calcTargetFunction(Table table) {
         // Расчёт целевой функции
         int L = 0;
         for (int i = 0; i < table.transportField.length; i++) {
             for (int j = 0; j < table.transportField[i].length; j++) {
                 L += table.transportField[i][j] * table.mainField[i][j];
             }
-            if(!Objects.isNull(table.factoriesCost)){
-                if(table.factoriesCost.size() <= i ) continue;
+            if (!Objects.isNull(table.factoriesCost)) {
+                if (table.factoriesCost.size() <= i) continue;
                 L += table.factoriesCost.get(i)[0] * Arrays.stream(table.transportField[i]).reduce(0, Integer::sum) + table.factoriesCost.get(i)[1];
             }
         }

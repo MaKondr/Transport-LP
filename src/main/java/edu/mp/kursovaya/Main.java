@@ -13,7 +13,7 @@ import static edu.mp.kursovaya.CalculateOptimalFactories.*;
 
 
 public class Main {
-    private static final Table table = table4;
+    private static final Table table = table3;
 
     public static void main(String[] args) {
 
@@ -35,7 +35,7 @@ public class Main {
             System.out.println("Balanced table:");
             normalize(table);
             System.out.println(renderMainTable(table));
-        } else System.out.println("TRUE\n");
+        } else System.out.println("TRUE: Table is Balanced\n");
 
         // Нахождение Начального Опорного плана
         System.out.println("1. Find First Plan:\n");
@@ -51,11 +51,11 @@ public class Main {
 
         while (true) {
 
-            boolean isNoneDegenerate = isNoneDegenerate(table);
-            if (!isNoneDegenerate) {
-                System.out.println("Plan is None Degenerate: " + isNoneDegenerate + "\n");
+            Map<String, ?> isNoneDegenerate = isNoneDegenerate(table);
+            System.out.println("Plan is None Degenerate: " + isNoneDegenerate.get("check") + "\n");
+            if (!(Boolean)isNoneDegenerate.get("check")) {
+                setEpsilon(table, isNoneDegenerate);
             }
-            System.out.println("Plan is None Degenerate: " + isNoneDegenerate + "\n");
 
             // Определяем потенциалы и вычисляем псевдостоимости
             setPseudoCost(table);
@@ -78,12 +78,7 @@ public class Main {
 
             // Составляем цикл пересчёта
             System.out.println("4. Find Recalculation Loop\n");
-
             Integer[] startCeil = findOptimalCeil(isOptimalPlan);
-//            String ceil = isOptimalPlan.get("ceil").toString();
-//            Integer[] startCeil = Arrays.stream(ceil.split(",")).map(Integer::parseInt).toArray(Integer[]::new);
-
-
             recalculateLoop(table, startCeil);
             System.out.println(renderRecalculationLoop(table) + "\n");
 
