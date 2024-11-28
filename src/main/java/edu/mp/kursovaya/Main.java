@@ -13,11 +13,11 @@ import static edu.mp.kursovaya.CalculateOptimalFactories.*;
 
 
 public class Main {
-    private static final Table table = table3;
+//    private static final Table table = table5;
 
     public static void main(String[] args) {
 
-//        Table table = initTable();
+        Table table = initTable();
 
         // ИНИЦИАЛИЗАЦИЯ ТАБЛИЦЫ
         System.out.println("Input table:");
@@ -40,7 +40,7 @@ public class Main {
         // Нахождение Начального Опорного плана
         System.out.println("1. Find First Plan:\n");
         findFirstPlan(table);
-        System.out.println(renderTransportTable(table));
+        System.out.println(renderTransportTable(table, false));
 
         // Значение Целевой Функции
         System.out.println("L=" + calcTargetFunction(table) + "\n");
@@ -71,15 +71,14 @@ public class Main {
 
                 // План оптимален. Вывод конечной таблицы и целевой функции
                 System.out.println("Plan is OPTIMAL!\n");
-                System.out.println(renderTransportTable(table));
+                System.out.println(renderTransportTable(table, false));
                 System.out.println("L=" + calcTargetFunction(table) + "\n");
                 break;
             }
 
             // Составляем цикл пересчёта
             System.out.println("4. Find Recalculation Loop\n");
-            Integer[] startCeil = findOptimalCeil(isOptimalPlan);
-            recalculateLoop(table, startCeil);
+            recalculateLoop(table, findOptimalCeil(isOptimalPlan));
             System.out.println(renderRecalculationLoop(table) + "\n");
 
             // Находим значение пересчёта
@@ -91,7 +90,7 @@ public class Main {
             // Выполняем пересчёт
             System.out.println("6. Calculate Conversion\n");
             calcConversion(table, minConvValue);
-            System.out.println(renderTransportTable(table));
+            System.out.println(renderTransportTable(table, true));
 
         }
     }

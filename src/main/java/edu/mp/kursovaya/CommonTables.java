@@ -70,5 +70,21 @@ public class CommonTables {
                 factories,
                 consumers
         );
+    }    public static Table table5;
+
+    static {
+        Integer[][] costs = {
+                {2,3,6,8,1,3},
+                {1,7,2,6,5,2},
+                {3,6,1,2,4,5},
+                {7,4,2,5,3,1},
+        };
+        Integer[] consumers = {1,4,4,5,1,3};
+        Integer[] factories = {7,6,2,3};
+        table5 = new Table(
+                costs,
+                factories,
+                consumers
+        );
     }
 }

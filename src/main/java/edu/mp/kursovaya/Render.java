@@ -1,9 +1,6 @@
 package edu.mp.kursovaya;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Render {
     public static String renderMainTable(Table table) {
@@ -28,22 +25,28 @@ public class Render {
         return String.join("\n", rows);
     }
 
-    public static String renderTransportTable(Table table) {
+    public static String renderTransportTable(Table table, boolean showEpsilon) {
         List<StringBuilder> rows = new ArrayList<>() {{
             add(new StringBuilder("Transport Table\n"));
         }};
-        rows.getFirst().append("a/b");
-        for (Integer i : table.consumersVolume) {
-            rows.getFirst().append("\t").append(i);
-        }
-        rows.getFirst().append("\n");
+//        rows.getFirst().append("a/b");
+//        for (Integer i : table.consumersVolume) {
+//            rows.getFirst().append("\t").append(i);
+//        }
+//        rows.getFirst().append("\n");
 
-        for (int i = 0; i < table.mainField.length; i++) {
-            rows.add(new StringBuilder(table.factoriesVolume[i] + "\t"));
-            for (Integer ceil : table.transportField[i]) {
-                rows.getLast().append(ceil.equals(0) ? "X" : ceil).append("\t");
+        for (int i = 0; i < table.transportField.length; i++) {
+//            rows.add(new StringBuilder(table.factoriesVolume[i] + "\t"));
+            for (int j = 0; j < table.transportField[i].length; j++) {
+                if (!table.transportField[i][j].equals(0)) {
+                    rows.getLast().append(table.transportField[i][j]).append("\t");
+                } else if (Objects.nonNull(table.epsilonsCeil) && table.epsilonsCeil[i][j] && showEpsilon) {
+                    rows.getLast().append("ξ").append("\t");
+                } else {
+                    rows.getLast().append("X").append("\t");
+                }
             }
-            rows.getLast().append("\n");
+            rows.getLast().append("\n\n");
         }
 
         return String.join("\n", rows);
@@ -104,15 +107,27 @@ public class Render {
 
         for (int i = 0; i < transportField.length; i++) {
             rows.add(new StringBuilder());
-           column : for (int j = 0; j < transportField.length; j++) {
+            column:
+            for (int j = 0; j < transportField[i].length; j++) {
                 for (int pos = 0; pos < loop.length; pos++) {
                     if (loop[pos][0].equals(i) && loop[pos][1].equals(j)) {
                         String sign = pos % 2 == 0 ? "+" : "-";
-                        rows.getLast().append(sign).append(transportField[i][j]).append("\t");
+                        if (table.isEpsilon(i, j)) {
+                            rows.getLast().append(sign).append("ξ").append("\t");
+                        } else {
+                            rows.getLast().append(sign).append(transportField[i][j]).append("\t");
+                        }
                         continue column;
                     }
                 }
-                rows.getLast().append(transportField[i][j].equals(0) ? "X" : transportField[i][j]).append("\t");
+                if (table.isEpsilon(i, j)) {
+                    rows.getLast().append("ξ").append("\t");
+                } else if (!transportField[i][j].equals(0)) {
+                    rows.getLast().append(transportField[i][j]).append("\t");
+                } else {
+                    rows.getLast().append("X").append("\t");
+                }
+
             }
             rows.getLast().append("\n");
         }

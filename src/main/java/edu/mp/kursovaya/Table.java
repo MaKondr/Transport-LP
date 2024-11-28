@@ -3,6 +3,7 @@ package edu.mp.kursovaya;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class Table {
 
@@ -27,11 +28,12 @@ public class Table {
     // Поле с псевдостоимостью
     Integer[][] pseudoField;
 
-    // Клетки которые мы обозначили за эпсилон
-    List<Integer[]> epsilonsCeil;
 
     // Цикл для пересчёта
     Integer[][] loop;
+
+    // Клетки которые мы обозначили за эпсилон
+    boolean[][] epsilonsCeil;
 
     public Table(Integer[][] costs, Integer[] factories, Integer[] consumers) {
         mainField = costs;
@@ -49,6 +51,24 @@ public class Table {
             }
         }};
         return this;
+    }
+
+    public int sizeEpsilons(){
+        if (Objects.isNull(epsilonsCeil)) return 0;
+        int count = 0;
+        for (boolean[] booleans : epsilonsCeil) {
+            for (boolean aBoolean : booleans) {
+                if(aBoolean) count++;
+            }
+        }
+        return count;
+    }
+
+    public boolean isEpsilon(int i, int j) {
+        if (Objects.nonNull(epsilonsCeil)) {
+            if (epsilonsCeil[i][j]) return true;
+        }
+        return false;
     }
 
 

@@ -11,14 +11,17 @@ public class Calculate {
 
     public static Map<String, ?> isNoneDegenerate(Table table) {
         Integer[][] transportField = table.transportField;
+        boolean[][] epsilonsCeil = table.epsilonsCeil;
 
         int targetsCount = 0;
         int m = transportField.length;
         int n = transportField[0].length;
 
-        for (Integer[] rows : transportField) {
-            for (Integer row : rows) {
-                targetsCount += row.equals(0) ? 0 : 1;
+        for (int i = 0; i < transportField.length; i++) {
+            for (int j = 0; j < transportField[i].length; j++) {
+                if(!transportField[i][j].equals(0) || table.isEpsilon(i,j)) {
+                    targetsCount += 1 ;
+                }
             }
         }
 
@@ -31,20 +34,22 @@ public class Calculate {
     public static void setEpsilon(Table table, Map<String, ?> map) {
         Integer targetsCount = (Integer) map.get("count");
         Integer[][] transportField = table.transportField;
-        table.epsilonsCeil = new ArrayList<>();
+        if (Objects.isNull(table.epsilonsCeil)) {
+            table.epsilonsCeil = new boolean[transportField.length][transportField[0].length];
 
+        }
         for (int i = 0; i < transportField.length; i++) {
             for (int j = 0; j < transportField[i].length; j++) {
                 if (transportField[i][j].equals(0)) {
-                    table.epsilonsCeil.add(new Integer[]{i, j});
+                    table.epsilonsCeil[i][j] = true;
                 }
-                if (targetsCount == table.epsilonsCeil.size()) {
+                if (targetsCount == table.sizeEpsilons()) {
                     return;
                 }
             }
         }
-
     }
+
 
     public static void normalize(Table table) {
         int aSum = Arrays.stream(table.factoriesVolume).reduce(0, Integer::sum);
@@ -138,7 +143,9 @@ public class Calculate {
                 L += table.transportField[i][j] * table.mainField[i][j];
             }
             if (!Objects.isNull(table.factoriesCost)) {
-                if (table.factoriesCost.size() <= i) continue;
+                if (table.factoriesCost.size() <= i) {
+                    continue;
+                };
                 L += table.factoriesCost.get(i)[0] * Arrays.stream(table.transportField[i]).reduce(0, Integer::sum) + table.factoriesCost.get(i)[1];
             }
         }
