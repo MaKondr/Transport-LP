@@ -11,40 +11,43 @@ import static edu.mp.kursovaya.CalculateOptimalFactories.*;
 
 
 public class Main {
-    private static final Table table = table7;
+    private static final Table table = tableNikita;
     static final Table[] tables = initAllTable();
 
     public static void main(String[] args) {
         while (true) {
             System.out.println("Input operating mode: ");
             System.out.println("\t 1. main mode");
-            System.out.println("\t 2. all mode");
-            System.out.println("\t 3. debugging mode");
+            System.out.println("\t IN PROGRESS 2. manual mode");
+            System.out.println("\t 3. all mode");
+            System.out.println("\t 4. debugging mode");
             System.out.println("\t 0. exit");
             System.out.print("> ");
             int mode = new Scanner(System.in).nextInt();
             if (mode == 0) break;
 
-            if (mode == 2) {
+            if (mode == 3) {
                 List<Integer> targets = new ArrayList<>();
                 for (int n = 0; n < tables.length; n++) {
                     System.out.println("***** NUMBER OF TABLE " + n + " *****");
                     targets.add(calculate(tables[n], false));
-                    int min = targets.stream().min(Integer::compareTo).orElse(-1);
-                    int indexMin = targets.indexOf(min);
-                    for (int i = 0; i < targets.size(); i++) {
-                        System.out.print(i + ".\t" + targets.get(i));
-                        if (indexMin == i) System.out.print("\t->\tmin");
-                        System.out.println();
-                    }
-                    combinationFactories.forEach(System.out::println);
-                    System.out.println();
-                    System.out.println(combinationFactories.get(indexMin));
                 }
-            } else if (mode == 3) {
+                int min = targets.stream().min(Integer::compareTo).orElse(-1);
+                int indexMin = targets.indexOf(min);
+                for (int i = 0; i < targets.size(); i++) {
+                    System.out.print(i + ".\t" + targets.get(i));
+                    if (indexMin == i) System.out.print("\t->\tmin");
+                    System.out.println();
+                }
+                combinationFactories.forEach(System.out::println);
+                System.out.println();
+                System.out.println(combinationFactories.get(indexMin));
+            } else if (mode == 4) {
                 calculate(table, true);
             }else if (mode == 1){
                 calculate(initTable(), true);
+            }else if (mode == 2){
+                calculate(initManualTable(), true);
             }
         }
 
@@ -103,10 +106,15 @@ public class Main {
 
                 // План оптимален. Вывод конечной таблицы и целевой функции
                 System.out.println("Plan is OPTIMAL!\n");
-                System.out.println(renderTransportTable(table, false));
+                System.out.println(renderTransportTable(table, true));
                 int L = calcTargetFunction(table);
                 System.out.println("L=" + L + "\n");
                 return L;
+            }else {
+                System.out.println(renderTransportTable(table, true));
+                int L = calcTargetFunction(table);
+                System.out.println("L=" + L + "\n");
+
             }
 
             // Составляем цикл пересчёта

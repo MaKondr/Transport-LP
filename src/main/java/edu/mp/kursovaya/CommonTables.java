@@ -148,5 +148,21 @@ public class CommonTables {
                 factories,
                 consumers
         );
+    }    public static Table tableNikita;
+
+    static {
+        Integer[][] costs = {
+                {100, 100, 100, 1},
+                {100, 100, 1, 100},
+                {100, 1, 100, 100},
+                {1, 100, 100, 100},
+        };
+        Integer[] consumers = {10, 20, 30, 40};
+        Integer[] factories = {40, 30, 20, 10};
+        tableNikita = new Table(
+                costs,
+                factories,
+                consumers
+        );
     }
 }

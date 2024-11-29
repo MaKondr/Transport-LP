@@ -24,7 +24,16 @@ public class CalculateOptimalFactories {
         }
         return tables;
     }
-
+    public static Table initManualTable(){
+        ManualInput.initInput();
+        combinationFactories = new ArrayList<>();
+        generateCombinations(ManualInput.factories, 0, new ArrayList<>(), combinationFactories);
+        Table[] tables = new Table[combinationFactories.size()];
+        for (int i = 0; i < combinationFactories.size(); i++) {
+            tables[i] = new Table(ManualInput.mainTable, combinationFactories.get(i).toArray(Integer[]::new), Arrays.copyOf(ManualInput.consumers,ManualInput.consumers.length)).setFactoriesCost(ManualInput.A,ManualInput.B);
+        }
+        return null;
+    }
 
     private static Integer[] optimalFactories() {
         List<List<Integer>> combinationFactories = new ArrayList<>();

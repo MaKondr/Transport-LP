@@ -50,6 +50,8 @@ public class CalculatePotential {
             }
             if (!updated && Objects.nonNull(table.epsilonsCeil)) {
                 moveEpsilon(table);
+                Arrays.fill(table.factoriesPotential, 1,table.factoriesPotential.length, null);
+                Arrays.fill(table.consumersPotential, null);
             }
 
         }
@@ -167,6 +169,7 @@ public class CalculatePotential {
             if (min > transportField[curI][curJ]) {
                 min = transportField[curI][curJ];
             }
+//            if (min != 0) return 1;
         }
         return min;
 
