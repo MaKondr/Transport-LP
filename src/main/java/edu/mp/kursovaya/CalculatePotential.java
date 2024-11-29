@@ -12,7 +12,6 @@ public class CalculatePotential {
         Integer[] consumersPotential = table.consumersPotential;
 
         fillEmptyPotential(table);
-        System.out.println();
         for (int i = 0; i < pseudoField.length; i++) {
             for (int j = 0; j < pseudoField[i].length; j++) {
                 if (transportField[i][j].equals(0) && !table.isEpsilon(i, j)) {
@@ -20,6 +19,70 @@ public class CalculatePotential {
                 }
             }
         }
+    }
+
+    private static void fillEmptyPotential(Table table) {
+        Integer[][] transportField = table.transportField;
+        Integer[] factoriesPotential = table.factoriesPotential;
+        Integer[] consumersPotential = table.consumersPotential;
+        Integer[][] mainField = table.mainField;
+        while (true) {
+            boolean updated = false;
+
+            for (int i = 0; i < transportField.length; i++) {
+                for (int j = 0; j < transportField[i].length; j++) {
+                    boolean isEpsilon = table.isEpsilon(i, j);
+                    if (!transportField[i][j].equals(0) || isEpsilon) {
+                        if (Objects.isNull(factoriesPotential[i]) && Objects.isNull(consumersPotential[j])) {
+                            // Оба потенциала null, ничего не делаем
+                        } else if (Objects.isNull(consumersPotential[j])) {
+                            consumersPotential[j] = mainField[i][j] - factoriesPotential[i];
+                            updated = true;
+                        } else if (Objects.isNull(factoriesPotential[i])) {
+                            factoriesPotential[i] = mainField[i][j] - consumersPotential[j];
+                            updated = true;
+                        }
+                    }
+                }
+            }
+            if (!isEmptyPotentials(factoriesPotential, consumersPotential)) {
+                break;
+            }
+            if (!updated && Objects.nonNull(table.epsilonsCeil)) {
+                moveEpsilon(table);
+            }
+
+        }
+    }
+
+    private static void moveEpsilon(Table table) {
+        boolean[][] epsilonsCeil = table.epsilonsCeil;
+
+        for (int i = 0; i < epsilonsCeil.length; i++) {
+            for (int j = 0; j < epsilonsCeil[i].length; j++) {
+                if (epsilonsCeil[i][j]) {
+                    epsilonsCeil[i][j] = false;
+                    int tmpJ = j, tmpI = i;
+                    for (int k = i; k < epsilonsCeil.length; k++) {
+                        for (int l = j; l < epsilonsCeil[k].length; l++) {
+                            if (table.transportField[k][l].equals(0) && !epsilonsCeil[k][l] && !(l == tmpJ && k == tmpI)) {
+                                epsilonsCeil[k][l] = true;
+                                return;
+                            }
+                        }
+                        j = 0;
+                        if (k == epsilonsCeil.length - 1) {
+                            k = i = -1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static boolean isEmptyPotentials(Integer[] factoriesPotential, Integer[] consumersPotential) {
+        return !(Arrays.stream(consumersPotential).allMatch(Objects::nonNull) &&
+                Arrays.stream(factoriesPotential).allMatch(Objects::nonNull));
     }
 
     public static void recalculateLoop(Table table, Integer[] startCeil) {
@@ -112,14 +175,14 @@ public class CalculatePotential {
     public static void calcConversion(Table table, Integer min) {
         Integer[][] loop = table.loop;
         Integer[][] transportField = table.transportField;
-        if (Objects.nonNull(table.epsilonsCeil) && isSameValue(table)) {
+        if (Objects.nonNull(table.epsilonsCeil) && !min.equals(0) && isSameValue(table)) {
             System.out.println("SAME VALUES");
         }
         for (int i = 0; i < loop.length; i++) {
             int curI = loop[i][0], curJ = loop[i][1];
 
             if (i % 2 == 0) {
-                if (table.isEpsilon(curI,curJ)){
+                if (table.isEpsilon(curI, curJ)) {
                     table.epsilonsCeil[curI][curJ] = false;
                 }
                 transportField[curI][curJ] = transportField[curI][curJ] + min;
@@ -130,7 +193,8 @@ public class CalculatePotential {
                         int newJ = -1;
                         int newI = -1;
                         int tmp = curJ;
-                        find : for (int eI = curI; eI < table.epsilonsCeil.length; eI++) {
+                        find:
+                        for (int eI = curI; eI < table.epsilonsCeil.length; eI++) {
                             newI = eI;
                             for (int eJ = tmp; eJ < table.epsilonsCeil[eI].length; eJ++) {
                                 newJ = eJ;
@@ -138,7 +202,9 @@ public class CalculatePotential {
                                     break find;
                                 }
                             }
-                            tmp = 0;
+                            if (eI == table.epsilonsCeil.length - 1) {
+                                tmp = 0;
+                            }
                         }
                         table.epsilonsCeil[curI][curJ] = false;
                         table.epsilonsCeil[newI][newJ] = true;
@@ -155,14 +221,16 @@ public class CalculatePotential {
         Integer[][] transportField = table.transportField;
         boolean[][] epsilonsCeil = table.epsilonsCeil;
         boolean isSame = false;
-        for (int i = 1; i < loop.length; i+=2) {
-            int aI = loop[i][0]; int aJ = loop[i][1];
-            for (int j = 1; j < loop.length; j+=2) {
-                int bI = loop[j][0]; int bJ = loop[j][1];
-                if(i != j){
-                    if(transportField[aI][aJ].equals(transportField[bI][bJ])){
+        for (int i = 1; i < loop.length; i += 2) {
+            int aI = loop[i][0];
+            int aJ = loop[i][1];
+            for (int j = 1; j < loop.length; j += 2) {
+                int bI = loop[j][0];
+                int bJ = loop[j][1];
+                if (i != j) {
+                    if (transportField[aI][aJ].equals(transportField[bI][bJ])) {
                         epsilonsCeil[aI][aJ] = true;
-                        isSame=true;
+                        return true;
                     }
                 }
             }
@@ -206,68 +274,6 @@ public class CalculatePotential {
         int maxIndex = dif.indexOf(max);
         List<Integer[]> ceil = (List<Integer[]>) resultCheckOptimal.get("ceil");
         return ceil.get(maxIndex);
-    }
-
-    private static void fillEmptyPotential(Table table) {
-        Integer[][] transportField = table.transportField;
-        Integer[] factoriesPotential = table.factoriesPotential;
-        Integer[] consumersPotential = table.consumersPotential;
-        Integer[][] mainField = table.mainField;
-        while(true) {
-            boolean updated = false;
-
-            for (int i = 0; i < transportField.length; i++) {
-                for (int j = 0; j < transportField[i].length; j++) {
-                    boolean isEpsilon = table.isEpsilon(i, j);
-                    if (!transportField[i][j].equals(0) || isEpsilon) {
-                        if (Objects.isNull(factoriesPotential[i]) && Objects.isNull(consumersPotential[j])) {
-                            // Оба потенциала null, ничего не делаем
-                        } else if (Objects.isNull(consumersPotential[j])) {
-                            consumersPotential[j] = mainField[i][j] - factoriesPotential[i];
-                            updated = true;
-                        } else if (Objects.isNull(factoriesPotential[i])) {
-                            factoriesPotential[i] = mainField[i][j] - consumersPotential[j];
-                            updated = true;
-                        }
-                    }
-                }
-            }
-            if(!isEmptyPotentials(factoriesPotential,consumersPotential)){
-                break;
-            }
-            if(!updated && Objects.nonNull(table.epsilonsCeil)){
-                moveEpsilon(table);
-            }
-
-        }
-    }
-
-    private static void moveEpsilon(Table table) {
-        boolean[][] epsilonsCeil = table.epsilonsCeil;
-
-        for (int i = 0; i < epsilonsCeil.length; i++) {
-            for (int j = 0; j < epsilonsCeil[i].length; j++) {
-                if(epsilonsCeil[i][j]) {
-                    epsilonsCeil[i][j] = false;
-                    for (int k = i; k < epsilonsCeil.length; k++) {
-                        for (int l = j+1; l < epsilonsCeil[k].length; l++) {
-                            if(table.transportField[k][l].equals(0) && !epsilonsCeil[k][l]){
-                                epsilonsCeil[k][l] = true;
-                                return;
-                            }
-                        }
-                        j=0;
-                    }
-                }
-            }
-        }
-    }
-
-
-
-    private static boolean isEmptyPotentials(Integer[] factoriesPotential, Integer[] consumersPotential) {
-        return !(Arrays.stream(consumersPotential).allMatch(Objects::nonNull) &&
-                Arrays.stream(factoriesPotential).allMatch(Objects::nonNull));
     }
 
 

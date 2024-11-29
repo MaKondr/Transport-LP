@@ -19,8 +19,8 @@ public class Calculate {
 
         for (int i = 0; i < transportField.length; i++) {
             for (int j = 0; j < transportField[i].length; j++) {
-                if(!transportField[i][j].equals(0) || table.isEpsilon(i,j)) {
-                    targetsCount += 1 ;
+                if (!transportField[i][j].equals(0) || table.isEpsilon(i, j)) {
+                    targetsCount += 1;
                 }
             }
         }
@@ -138,15 +138,23 @@ public class Calculate {
     public static Integer calcTargetFunction(Table table) {
         // Расчёт целевой функции
         int L = 0;
+
         for (int i = 0; i < table.transportField.length; i++) {
+            int tmp = 0, tmp2 = 0;
             for (int j = 0; j < table.transportField[i].length; j++) {
                 L += table.transportField[i][j] * table.mainField[i][j];
+                tmp += table.transportField[i][j] * table.mainField[i][j];
             }
             if (!Objects.isNull(table.factoriesCost)) {
                 if (table.factoriesCost.size() <= i) {
                     continue;
-                };
+                }
+                System.out.print("L_" + i + " =\t" + tmp + " + ");
                 L += table.factoriesCost.get(i)[0] * Arrays.stream(table.transportField[i]).reduce(0, Integer::sum) + table.factoriesCost.get(i)[1];
+                tmp2 += table.factoriesCost.get(i)[0] * Arrays.stream(table.transportField[i]).reduce(0, Integer::sum) + table.factoriesCost.get(i)[1];
+                System.out.println(tmp2 + " = " + (tmp + tmp2));
+            } else {
+                System.out.println("L_" + i + " =\t" + tmp);
             }
         }
         return L;

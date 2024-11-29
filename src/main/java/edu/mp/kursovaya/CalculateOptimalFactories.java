@@ -1,16 +1,28 @@
 package edu.mp.kursovaya;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 import static edu.mp.kursovaya.InputValue.*;
 
 public class CalculateOptimalFactories {
+    public static List<List<Integer>> combinationFactories;
 
     private CalculateOptimalFactories() {
     }
 
     public static Table initTable() {
         return new Table(costs, optimalFactories(), consumers).setFactoriesCost(A,B);
+    }
+
+    public static Table[] initAllTable(){
+        combinationFactories = new ArrayList<>();
+        generateCombinations(factories, 0, new ArrayList<>(), combinationFactories);
+        Table[] tables = new Table[combinationFactories.size()];
+        for (int i = 0; i < combinationFactories.size(); i++) {
+            tables[i] = new Table(costs, combinationFactories.get(i).toArray(Integer[]::new), Arrays.copyOf(consumers,consumers.length)).setFactoriesCost(A,B);
+        }
+        return tables;
     }
 
 
@@ -72,7 +84,18 @@ public class CalculateOptimalFactories {
     private static List<List<Integer>> calcTransportVariance(List<List<Integer>> combinationFactories) {
         List<List<Integer>> transportVariances = new ArrayList<>();
 
+        List<Integer> factoriesMean = new ArrayList<>();
+
+        for (int i = 0; i < A.length; i++) {
+            int factoryMean = A[i] + Arrays.stream(costs[i]).reduce(0,Integer::sum) / costs.length;
+            factoriesMean.add(factoryMean);
+        }
+
+        int sumAmountConsumed = Arrays.stream(consumers).reduce(0, Integer::sum);
+        int indexOptimalFactory = factoriesMean.indexOf(factoriesMean.stream().min(Integer::compareTo).orElse(-1));
+
         for (List<Integer> combination : combinationFactories) {
+            int sumAmountProduced = combination.stream().reduce(0,Integer::sum);
             List<Integer> transportVariancesForConcreteVariant = new ArrayList<>();
             for (int i = 0; i < combination.size(); i++) {
                 double sum = 0;
@@ -80,7 +103,11 @@ public class CalculateOptimalFactories {
                     double d = (double) consumers[j] / Arrays.stream(consumers).reduce(0, Integer::sum);
                     sum += costs[i][j] * d;
                 }
-                transportVariancesForConcreteVariant.add((int) sum * combination.get(i));
+                if (i == indexOptimalFactory) {
+                    transportVariancesForConcreteVariant.add((int) sum * (combination.get(i) + (sumAmountConsumed - sumAmountProduced)));
+                }else {
+                    transportVariancesForConcreteVariant.add((int) sum * (combination.get(i)));
+                }
             }
             transportVariances.add(transportVariancesForConcreteVariant);
         }
